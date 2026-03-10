@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대학생 CNP 아카데미 성과 분석 리포트</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts: Pretendard -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/variable/pretendardvariable.css" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Pretendard Variable"', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        cnp: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fbfbfc;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+        
+        /* 한국어 줄바꿈 최적화 */
+        .keep-all {
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        /* 스크롤 페이드 애니메이션 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 글래스모피즘 카드 스타일 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        /* 텍스트 그라데이션 강조 */
+        .text-gradient {
+            background: linear-gradient(135deg, #0284c7 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Hero Section (배너형으로 구조 변경) -->
+    <section class="relative pt-12 pb-24 px-6 lg:px-24">
+        <!-- 배경 그라데이션 -->
+        <div class="absolute inset-0 z-[-1] bg-gradient-to-b from-cnp-50 to-transparent h-[600px]"></div>
+        
+        <div class="max-w-6xl mx-auto flex flex-col items-center">
+            
+            <!-- 1. 현수막(배너) 사이즈 이미지 -->
+            <!-- 4000x600 이미지에 완벽히 맞도록 비율(aspect-[4000/600])을 적용했습니다. -->
+            <div class="fade-up w-full aspect-[4000/600] rounded-3xl shadow-2xl overflow-hidden bg-slate-200 mb-16">                
+                <img src="./images/main.jpg" alt="" class="w-full h-full object-cover">
+            </div>
+
+            <!-- 2. 중앙 정렬된 타이틀 및 텍스트 -->
+            <div class="fade-up text-center max-w-3xl flex flex-col items-center" style="transition-delay: 0.1s;">
+                <span class="inline-block py-1 px-3 rounded-full bg-cnp-100 text-cnp-600 font-semibold text-sm mb-6 tracking-wide">
+                    DATA ANALYSIS REPORT
+                </span>
+                
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight mb-8 keep-all">
+                    2026 2월 대학생 <span class="text-gradient">CNP 아카데미</span><br>
+                    성과 분석 리포트
+                </h1>
+                
+                <p class="text-base sm:text-lg lg:text-xl text-slate-500 mb-12 leading-relaxed keep-all">
+                    건축공학도들에게 더 넓은 시야를 제공한 CNP 아카데미. <br class="hidden sm:block">
+                    참가자들의 생생한 피드백과 만족도 통계를 통해 이번 아카데미의 성과를 되돌아봅니다.
+                </p>
+                
+                <!-- 3. 만족도 데이터 카드 -->
+                <div class="flex flex-wrap justify-center gap-6 w-full max-w-lg">
+                    <div class="glass-card px-8 py-5 flex flex-col items-center flex-1 min-w-[150px]">
+                        <span class="text-slate-500 text-sm font-medium mb-1">종합 만족도</span>
+                        <span class="text-4xl font-bold text-slate-800">98<span class="text-2xl text-slate-500">%</span></span>
+                    </div>
+                    <div class="glass-card px-8 py-5 flex flex-col items-center flex-1 min-w-[150px]">
+                        <span class="text-slate-500 text-sm font-medium mb-1">추천 의향</span>
+                        <span class="text-4xl font-bold text-slate-800">100<span class="text-2xl text-slate-500">%</span></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Section 1: 운영 만족도 (도넛 차트) -->
+    <section class="py-24 px-6 lg:px-24 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-4 keep-all">기획 및 운영 만족도</h2>
+                <p class="text-slate-500 text-base sm:text-lg keep-all">아카데미의 취지, 규모, 그리고 조별 활동에 대한 참가자 평가입니다.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Chart 1 -->
+                <div class="glass-card p-6 lg:p-8 fade-up text-center flex flex-col items-center">
+                    <h3 class="text-xl font-bold mb-3 keep-all">취지 및 강의 부합도</h3>
+                    <p class="text-sm text-slate-500 mb-8 min-h-[48px] keep-all leading-relaxed">"구조설계 실무와 넓은 시야를 제공했다는 점에서 완벽히 부합했습니다."</p>
+                    <div class="relative w-40 h-40 sm:w-48 sm:h-48 shrink-0">
+                        <canvas id="chartQ1"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <span class="text-2xl font-bold text-slate-800">93%</span>
+                            <span class="text-xs text-slate-400">매우 그렇다</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart 2 -->
+                <div class="glass-card p-6 lg:p-8 fade-up text-center flex flex-col items-center" style="transition-delay: 0.1s;">
+                    <h3 class="text-xl font-bold mb-3 keep-all">참여 인원수 적절성</h3>
+                    <p class="text-sm text-slate-500 mb-8 min-h-[48px] keep-all leading-relaxed">"약 30명의 인원은 활동하고 친해지기에 매우 적절한 규모였습니다."</p>
+                    <div class="relative w-40 h-40 sm:w-48 sm:h-48 shrink-0">
+                        <canvas id="chartQ2"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <span class="text-2xl font-bold text-slate-800">86%</span>
+                            <span class="text-xs text-slate-400">매우 적절</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart 3 -->
+                <div class="glass-card p-6 lg:p-8 fade-up text-center flex flex-col items-center" style="transition-delay: 0.2s;">
+                    <h3 class="text-xl font-bold mb-3 keep-all">조 구성 및 활동</h3>
+                    <p class="text-sm text-slate-500 mb-8 min-h-[48px] keep-all leading-relaxed">"타 학교 학생들과 섞여 네트워킹을 할 수 있어 훌륭했습니다."</p>
+                    <div class="relative w-40 h-40 sm:w-48 sm:h-48 shrink-0">
+                        <canvas id="chartQ3"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <span class="text-2xl font-bold text-slate-800">80%</span>
+                            <span class="text-xs text-slate-400">매우 적절</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: 아카데미 하이라이트 -->
+    <section class="py-24 px-6 lg:px-24 bg-slate-50">
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-start">
+            
+            <div class="fade-up w-full sticky top-10">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-6 keep-all">아카데미에서 얻은<br><span class="text-gradient">가장 값진 경험들</span></h2>
+                <p class="text-slate-600 text-base sm:text-lg mb-8 leading-relaxed keep-all">
+                    참가자들이 직접 꼽은 아카데미의 하이라이트와 CNP 아카데미를 향해 남겨주신 진심 어린 코멘트입니다.
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-cnp-500"></div>
+                        <span class="text-xs font-bold text-cnp-600 bg-cnp-50 px-2 py-1 rounded mb-3 inline-block">제일 좋았던 점</span>
+                        <p class="text-slate-700 keep-all leading-relaxed text-sm sm:text-base">
+                            "졸업 이후 가지고 있었던 건축업계에서의 진로 분야들에 대해 깊이 이해할 수 있었고, 훌륭하신 선배님들의 강연으로 지식을 쌓는 귀중한 시간이었습니다."
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-cnp-500"></div>
+                        <span class="text-xs font-bold text-cnp-600 bg-cnp-50 px-2 py-1 rounded mb-3 inline-block">제일 좋았던 점</span>
+                        <p class="text-slate-700 keep-all leading-relaxed text-sm sm:text-base">
+                            "다양한 학교에서 같은 꿈을 꾸며 노력하는 여러 친구들과 만나서 서로 의견을 나누고 친해질 수 있는 장이 마련되어 정말 좋았습니다."
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-[#8b5cf6]"></div> 
+                        <span class="text-xs font-bold text-[#8b5cf6] bg-[#f5f3ff] px-2 py-1 rounded mb-3 inline-block">CNP에 하고 싶은 말</span>
+                        <p class="text-slate-700 keep-all leading-relaxed text-sm sm:text-base font-medium">
+                            "전혀 아쉬운 점이 없습니다! 다음에 또 참여하고 싶어요 ㅎㅎ 뜻깊은 시간과 좋은 자리 만들어 주셔서 정말 감사합니다."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 fade-up h-fit" style="transition-delay: 0.2s;">
+                <div class="h-40 sm:h-64 rounded-2xl overflow-hidden bg-slate-200 shadow-sm">
+                    <img src="./images/Grid1.jpg" alt="" class="w-full h-full object-cover">
+                </div>
+                <div class="h-40 sm:h-64 rounded-2xl overflow-hidden bg-slate-200 shadow-sm translate-y-6 sm:translate-y-10">
+                    <img src="./images/Grid2.jpg" alt="" class="w-full h-full object-cover">
+                </div>
+                <div class="h-40 sm:h-64 rounded-2xl overflow-hidden bg-slate-200 shadow-sm">
+                    <img src="./images/Grid3.jpg" alt="" class="w-full h-full object-cover">
+                </div>
+                <div class="h-40 sm:h-64 rounded-2xl overflow-hidden bg-slate-200 shadow-sm translate-y-6 sm:translate-y-10">
+                    <img src="./images/Grid4.jpg" alt="" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: 정성적 평가 (리뷰 카드 6개 유지) -->
+    <section class="py-24 px-6 lg:px-24 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-4 keep-all">더 많은 참가자 후기</h2>
+                <p class="text-slate-500 text-base sm:text-lg keep-all">아카데미를 통해 얻은 경험과 소중한 의견들입니다.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="glass-card p-6 sm:p-8 fade-up bg-slate-50 border-none flex flex-col">
+                    <div class="text-cnp-500 mb-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed font-medium keep-all flex-grow">
+                        "다양한 정보를 정말 훌륭하신 선배님들의 강연으로 습득할 수 있어서 매우 귀중한 시간이었습니다."
+                    </p>
+                    <div class="mt-6 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-cnp-100 flex items-center justify-center text-cnp-600 font-bold text-sm shrink-0">참가자</div>
+                        <div class="text-sm text-slate-500">강의 만족도</div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-card p-6 sm:p-8 fade-up bg-slate-50 border-none flex flex-col" style="transition-delay: 0.1s;">
+                    <div class="text-cnp-500 mb-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed font-medium keep-all flex-grow">
+                        "구조설계에 대한 전반적인 실무환경과 업무영역 등 건축공학도들에게 더 넓은 시야를 제공해주었습니다."
+                    </p>
+                    <div class="mt-6 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-cnp-100 flex items-center justify-center text-cnp-600 font-bold text-sm shrink-0">참가자</div>
+                        <div class="text-sm text-slate-500">프로그램 취지</div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card p-6 sm:p-8 fade-up bg-slate-50 border-none flex flex-col" style="transition-delay: 0.2s;">
+                    <div class="text-cnp-500 mb-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed font-medium keep-all flex-grow">
+                        "학교 밖에서 타 대학 학생들과 섞여 시야를 넓히고 네트워킹할 수 있었던 점이 이번 아카데미의 큰 수확이었습니다."
+                    </p>
+                    <div class="mt-6 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-cnp-100 flex items-center justify-center text-cnp-600 font-bold text-sm shrink-0">참가자</div>
+                        <div class="text-sm text-slate-500">네트워킹</div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="glass-card p-6 sm:p-8 fade-up bg-slate-50 border-none flex flex-col">
+                    <div class="text-cnp-500 mb-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed font-medium keep-all flex-grow">
+                        "약 30명의 인원과 6개 조 구성이 매우 적절해서, 서로 깊이 있게 대화하고 의견을 나누기에 완벽한 규모였습니다."
+                    </p>
+                    <div class="mt-6 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-cnp-100 flex items-center justify-center text-cnp-600 font-bold text-sm shrink-0">참가자</div>
+                        <div class="text-sm text-slate-500">운영 만족도</div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="glass-card p-6 sm:p-8 fade-up bg-slate-50 border-none flex flex-col" style="transition-delay: 0.1s;">
+                    <div class="text-cnp-500 mb-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed font-medium keep-all flex-grow">
+                        "구조 외에도 BIM, 3D 스캐닝, AI 등 건축업계 속 다른 분야들의 전문가 세미나가 특히 인상 깊었습니다."
+                    </p>
+                    <div class="mt-6 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-cnp-100 flex items-center justify-center text-cnp-600 font-bold text-sm shrink-0">참가자</div>
+                        <div class="text-sm text-slate-500">강의 콘텐츠</div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="glass-card p-6 sm:p-8 fade-up bg-slate-50 border-none flex flex-col" style="transition-delay: 0.2s;">
+                    <div class="text-cnp-500 mb-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="text-slate-700 leading-relaxed font-medium keep-all flex-grow">
+                        "4일이라는 시간이 짧게 느껴질 만큼 알찼습니다. 모두와 더 친해지기엔 일정이 타이트한 점 빼고는 완벽했어요!"
+                    </p>
+                    <div class="mt-6 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-cnp-100 flex items-center justify-center text-cnp-600 font-bold text-sm shrink-0">참가자</div>
+                        <div class="text-sm text-slate-500">개선점 및 건의</div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Section 4: 무한 갤러리 + 하단 단체사진 -->
+    <section class="py-24 px-6 lg:px-24 bg-slate-900">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-4 keep-all text-white">교육 현장 갤러리</h2>
+                <p class="text-slate-400 text-base sm:text-lg keep-all">CNP 아카데미의 뜨거웠던 열기와 생생한 기록들을 확인해보세요.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 fade-up">
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery1.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery2.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery3.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery4.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery5.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery6.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery7.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery8.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery9.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery10.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery11.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery12.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery13.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery14.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>
+                <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-800 group relative">
+                    <img src="./images/gallery15.jpg" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                </div>				
+				
+            </div>
+
+            <!-- 단체 사진 영역 -->
+            <div class="mt-16 h-48 sm:h-64 lg:h-[500px] w-full rounded-3xl fade-up overflow-hidden bg-slate-800">
+                <img src="./images/group photo.jpg" alt="" class="w-full h-full object-cover">
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12 text-center text-slate-500">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">CNP ACADEMY</h2>
+            <p class="text-xs sm:text-sm mb-2 keep-all">본 리포트는 대학생 CNP 아카데미 참가자들의 설문조사 데이터를 바탕으로 작성되었습니다.</p>
+            <p class="text-xs">© 202X CNP Group. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 스크립트: 차트 렌더링 및 스크롤 애니메이션 -->
+    <script>
+        // 공통 차트 설정
+        Chart.defaults.font.family = '"Pretendard Variable", sans-serif';
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+
+        const donutOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ' ' + context.label + ': ' + context.raw + '%';
+                        }
+                    }
+                }
+            },
+            borderWidth: 0,
+            layout: { padding: 10 }
+        };
+
+        new Chart(document.getElementById('chartQ1'), {
+            type: 'doughnut',
+            data: { labels: ['매우 그렇다', '그렇다'], datasets: [{ data: [93, 7], backgroundColor: ['#0284c7', '#bae6fd'], hoverOffset: 4 }] },
+            options: donutOptions
+        });
+
+        new Chart(document.getElementById('chartQ2'), {
+            type: 'doughnut',
+            data: { labels: ['매우 적절하다', '보통이다'], datasets: [{ data: [86, 14], backgroundColor: ['#0ea5e9', '#e0f2fe'], hoverOffset: 4 }] },
+            options: donutOptions
+        });
+
+        new Chart(document.getElementById('chartQ3'), {
+            type: 'doughnut',
+            data: { labels: ['매우 적절하다', '보통이다'], datasets: [{ data: [80, 20], backgroundColor: ['#3b82f6', '#dbeafe'], hoverOffset: 4 }] },
+            options: donutOptions
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            const fadeElements = document.querySelectorAll('.fade-up');
+            fadeElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
